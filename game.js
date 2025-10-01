@@ -6,7 +6,7 @@ kaboom({
 });
 
 // This section will be to load assets
-loadSprite("enemy", "https://kaboomjs.com/sprites/gigagantrum.png"))
+loadSprite("enemy", "https://kaboomjs.com/sprites/gigagantrum.png")
 
 // Main game scene
 scene()
