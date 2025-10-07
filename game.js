@@ -6,16 +6,16 @@ kaboom({
 });
 
 // This section will be to load assets
-loadSprite("playerChar", "https://kaboomjs.com/sprites/gigagantrum.png")
+loadSprite("playerChar", "https://kaboomjs.com/sprites/gigagantrum.png");
 
 // Custom Code
 function enemy_attack(owner){
-    destroyed = false
+    destroyed = false;
     onDestroy((owner) => {
-        destroyed = true
+        destroyed = true;
     })
-
-    loop(1, () => {
+    wait(3, () => {
+        loop(1, () => {
         if (destroyed){
             return;
         }
@@ -28,15 +28,16 @@ function enemy_attack(owner){
         ])
     }
     })
-}
-function attack(owner,opponent){
+    })
+};
+function player_attack(player){
     add([
         rect(owner.x,owner.y),
         color(0,0,0),
         pos(owner.x,owner.y),
         move(180,-1200),
     ])
-}
+};
 // Main game scene
 scene("main",(level) => {
 
@@ -49,11 +50,6 @@ scene("main",(level) => {
         "player",
         hittable = true,
     ]);
-    // Player controls
-    onKeyPress("left", () => { player.move(-1200, 0); hittable = false; wait(0.25, () => {player.move(1200,0)}); hittable = true;});
-    onKeyPress("right", () => { player.move(1200, 0); hittable = false; wait(0.25, () => {player.move(-1200,0)}); hittable = true;});
-    onKeyPress("down", () => { player.move(0, 1200); hittable = false; wait(0.25, () => {player.move(0,-1200)}); hittable = true;});
-    onKeyPress("z", () => {player.move(0,-300); wait(0.1,() => destroy(enemy),); wait(0.1,() => player.move(0,300))})
 
     //Making an enemy
     const enemy = add([
@@ -66,9 +62,22 @@ scene("main",(level) => {
     enemy_attack(player),
     "enemy",
     ]);
+    // Player controls
+    onKeyPress("left", () => { player.move(-1200, 0); hittable = false; wait(0.5, () => {player.move(1200,0)}); hittable = true;});
+    onKeyPress("right", () => { player.move(1200, 0); hittable = false; wait(0.5, () => {player.move(-1200,0)}); hittable = true;});
+    onKeyPress("down", () => { player.move(0, 1200); hittable = false; wait(0.5, () => {player.move(0,-1200)}); hittable = true;});
+    onKeyPress("z", () => {player.move(0,-300); wait(0.1,() => enemy.hurt(1),); wait(0.1,() => player.move(0,300))})
+    
+    enemy.on("death", () => {
+        destroy(enemy)
+    })
+
     player.onCollide(() => {
         if(hittable){
             destroy(player)
+        }
+        else{
+            return
         }
     })
 })
