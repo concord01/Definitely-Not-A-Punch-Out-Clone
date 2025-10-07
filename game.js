@@ -10,12 +10,23 @@ loadSprite("playerChar", "https://kaboomjs.com/sprites/gigagantrum.png")
 
 // Custom Code
 function enemy_attack(owner){
-    loop(1, () => {add([
+    destroyed = false
+    onDestroy((owner) => {
+        destroyed = true
+    })
+
+    loop(1, () => {
+        if (destroyed){
+            return;
+        }
+        else{
+        add([
         rect(5,15),
         pos(250,50),
         area(),
         move(90,1200),
-    ])
+        ])
+    }
     })
 }
 function attack(owner,opponent){
@@ -31,18 +42,17 @@ scene("main",(level) => {
 
     //player creation
     const player = add([
-        sprite("playerChar"),
-        pos(center().x-70, 400),
+        rect(20,20),
+        pos(center().x-10, 400),
         area({ scale: 0.7 }),
-        body(),
         timer(),
         "player",
         hittable = true,
     ]);
     // Player controls
-    onKeyDown("left", () => { player.move(-200, 0); hittable = false; wait(0.25, () => {player.move(200,0)}); hittable = true;});
-    onKeyDown("right", () => { player.move(200, 0); hittable = false; wait(0.25, () => {player.move(-200,0)}); hittable = true;});
-    onKeyDown("down", () => { player.move(0, 200); hittable = false; wait(0.25, () => {player.move(0,-200)}); hittable = true;});
+    onKeyPress("left", () => { player.move(-1200, 0); hittable = false; wait(0.25, () => {player.move(1200,0)}); hittable = true;});
+    onKeyPress("right", () => { player.move(1200, 0); hittable = false; wait(0.25, () => {player.move(-1200,0)}); hittable = true;});
+    onKeyPress("down", () => { player.move(0, 1200); hittable = false; wait(0.25, () => {player.move(0,-1200)}); hittable = true;});
     onKeyPress("z", () => {player.move(0,-300); wait(0.1,() => destroy(enemy),); wait(0.1,() => player.move(0,300))})
 
     //Making an enemy
@@ -56,10 +66,11 @@ scene("main",(level) => {
     enemy_attack(player),
     "enemy",
     ]);
-    
-    // player.onCollide("punch", (punch, col) =>{
-    // destroy(player)
-    // })
+    player.onCollide(() => {
+        if(hittable){
+            destroy(player)
+        }
+    })
 })
 
 
