@@ -4,9 +4,35 @@ kaboom({
     height:800,
     background: [100,200,200]
 });
-
+action_check = true;
 // This section will be to load assets
 loadSprite("playerChar", "https://kaboomjs.com/sprites/gigagantrum.png");
+loadSpriteAtlas("player.png", {
+        "player": {
+            x: 8, // X-coordinate of the top-left corner of the first frame
+            y: 0, // Y-coordinate of the top-left corner of the first frame
+            width: 64, // Width of the entire sprite sheet
+            height: 160, // Height of the entire sprite sheet
+            sliceX: 2, // Number of columns in the sprite sheet
+            sliceY: 5, // Number of rows in the sprite sheet
+            anims: {
+                "punch": {
+                    from: 2, // Starting frame index for this animation
+                    to: 4, // Ending frame index for this animation
+                    speed: 20, // Animation speed (frames per second)
+                    loop: false, // Whether the animation should loop
+                },
+                // Add more animations as needed
+                "idle": {
+                    from: 0,
+                    to: 1,
+                    speed: 3,
+                    loop: true,
+                }
+            },
+        },
+        // Add more sprite definitions if your sheet contains multiple distinct sprites
+    });
 
 // Custom Code
 function enemy_attack(owner){
@@ -30,12 +56,14 @@ function enemy_attack(owner){
     })
     })
 };
-function player_attack(player){
+function player_attack(owner){
     add([
-        rect(owner.x,owner.y),
+        rect(30,30),
         color(0,0,0),
         pos(owner.x,owner.y),
+        area(),
         move(180,-1200),
+        "player_punch"
     ])
 };
 // Main game scene
@@ -43,8 +71,9 @@ scene("main",(level) => {
 
     //player creation
     const player = add([
-        rect(20,20),
-        pos(center().x-10, 400),
+        sprite("player", {anim: "idle"}),
+        scale(5),
+        pos(center().x-32, 400),
         area({ scale: 0.7 }),
         timer(),
         "player",
@@ -63,10 +92,23 @@ scene("main",(level) => {
     "enemy",
     ]);
     // Player controls
+    
     onKeyPress("left", () => { player.move(-1200, 0); hittable = false; wait(0.5, () => {player.move(1200,0)}); hittable = true;});
     onKeyPress("right", () => { player.move(1200, 0); hittable = false; wait(0.5, () => {player.move(-1200,0)}); hittable = true;});
     onKeyPress("down", () => { player.move(0, 1200); hittable = false; wait(0.5, () => {player.move(0,-1200)}); hittable = true;});
-    onKeyPress("z", () => {player.move(0,-300); wait(0.1,() => enemy.hurt(1),); wait(0.1,() => player.move(0,300))})
+    onKeyPress("z", () => {
+        if(action_check){
+            action_check = false;
+            player.play("punch");
+            player.move(0,-800); 
+            wait(0.1,() => player_attack(player)); 
+            wait(0.2,() => player.play("idle"), player.move(0,800));
+            action_check = true;
+        }
+        else{
+            return
+        }
+    })
     
     enemy.on("death", () => {
         destroy(enemy)
