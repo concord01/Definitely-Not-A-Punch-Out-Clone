@@ -86,8 +86,7 @@ function enemy_attack(owner){
     onDestroy((owner) => {
         destroyed = true;
     })
-    wait(3, () => {
-        loop(3, () => {
+    wait(rand(5), () => {
         if (destroyed){
             return;
         }
@@ -109,8 +108,7 @@ function enemy_attack(owner){
         
     }
     })
-    })
-};
+    };
 function player_attack(owner){
     add([
         rect(30,30),
@@ -183,8 +181,9 @@ scene("main",(level) => {
             wait(0.3,() => {action_check = true;})
         }
         }); 
-    
-    enemy_attack(enemy)
+    loop(1, () => {
+        enemy_attack(enemy)
+    })
     enemy.on("death", () => {
         destroy(enemy)
     })
