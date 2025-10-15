@@ -81,6 +81,7 @@ loadSpriteAtlas("player.png", {
     });
 
 // Custom Code
+enemy_hittable = true;
 function enemy_attack(owner){
     destroyed = false;
     onDestroy((owner) => {
@@ -92,18 +93,21 @@ function enemy_attack(owner){
         }
         else{
         owner.play("punch")
+        enemy_hittable = false
         wait(0.5, () => {
             add([
             rect(5,15),
             pos(250,owner.y),
             area(),
-            move(90,500),
+            move(90,1200),
             anchor("center"),
+            opacity(0),
             "enemy_punch"
             ])
         })
         wait(1, () => {
             owner.play("idle")
+            enemy_hittable = true;
         })
         
     }
@@ -117,6 +121,7 @@ function player_attack(owner){
         area(),
         anchor("center"),
         move(90,-1200),
+        opacity(0),
         "player_punch"
     ])
 };
@@ -128,7 +133,7 @@ scene("main",(level) => {
     sprite("enemy", {anim: "idle"}),
     pos(center().x, 300),
     area(),
-    health(5),
+    health(30),
     scale(7),
     anchor("center"),
     "enemy",
@@ -142,10 +147,25 @@ scene("main",(level) => {
         area({ scale: 0.3}),
         anchor("center"),
         timer(),
+        health(5),
         "player",
         hittable = true,
     ]);
-
+    //health values 
+    enemy_health = enemy.hp()
+    const enemy_health_label =add([
+        text("Enemy Health:" + enemy_health),
+        scale(0.5),
+        pos(24,24),
+        fixed(),
+    ]);
+    player_health = player.hp()
+    const player_health_label =add([
+        text("Player Health:" + player_health),
+        scale(0.5),
+        pos(24,48),
+        fixed(),
+    ]);
 
     // Player controls
     action_check = true;
@@ -167,9 +187,6 @@ scene("main",(level) => {
             wait(0.6,() => {action_check = true;})
         }
     });
-    // onKeyPress("right", () => { player.move(1200, 0); player.play("dodge_right"); hittable = false; wait(0.5, () => {player.move(-1200,0), player.play("idle")}); hittable = true;});
-
-    // onKeyPress("down", () => { player.move(0, 1200); hittable = false; wait(0.5, () => {player.move(0,-1200)}); hittable = true;}); 
 
     onKeyPress("z", () => {
         if(action_check){
@@ -181,26 +198,50 @@ scene("main",(level) => {
             wait(0.3,() => {action_check = true;})
         }
         }); 
+    // calling enemy attack funciton on loop
     loop(3, () => {
         enemy_attack(enemy)
     })
+    // On collision events and on thing death events
     enemy.on("death", () => {
         destroy(enemy)
+        wait(1.5, () => {go("win")})
     })
     enemy.onCollide("player_punch", (player_punch) =>{
+        if (enemy_hittable) {
         enemy.hurt(1)
         enemy.play("hurt")
+        enemy_health = enemy_health-1;
+        enemy_health_label.text= "Enemy Health: "+enemy_health
         wait(1.5, () => {enemy.play("idle")})
+        }
     })
     player.onCollide("enemy_punch", (enemy_punch) => {
         if(hittable){
-            destroy(player)
+            player.hurt(1)
+            player.play("hurt")
+            action_check = false;
+            player_health = player_health - 1;
+            player_health_label.text= "Player Health: "+player_health
+            wait(1.5, () => {player.play("idle"), action_check = true})
         }
         else{
             return
         }
     })
+    player.on("death", () => {
+        destroy(player)
+        wait(1.5, () => {go("lose")})
+    })
 })
-
+//Scene that plays when you die
+scene("lose", () => {
+    add([ text("Game Over"), pos(center()), anchor("center") ]);
+    wait(2, () => { go("main")});
+})
+scene("win", () => {
+    add([ text("You Win!!!!!!!!"), pos(center()), anchor("center") ]);
+    wait(5, () => { go("main")});
+})
 
 go("main")
