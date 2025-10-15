@@ -194,7 +194,7 @@ scene("main",(level) => {
             player.play("punch");
             player.move(0,-800); 
             wait(0.1,() => {player_attack(player)})
-            wait(0.2,() => {player.play("idle"), player.move(0,800)})
+            wait(0.2,() => {player.play("idle"), player.moveTo(center().x, 420)})
             wait(0.3,() => {action_check = true;})
         }
         }); 
