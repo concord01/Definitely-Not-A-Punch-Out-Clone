@@ -142,8 +142,8 @@ scene("main",(level) => {
     //player creation
     const player = add([
         sprite("player", {anim: "idle"}),
-        pos(center().x, 420),
-        scale(3.5),
+        pos(center().x, 370),
+        scale(5),
         area({ scale: 0.3}),
         anchor("center"),
         timer(),
@@ -174,7 +174,7 @@ scene("main",(level) => {
             action_check = false;
             player.play("dodge_left");
             player.move(-2400,0); 
-            wait(0.5,() => {player.move(2400,0), player.play("idle")})
+            wait(0.5,() => {player.moveTo(center().x, 370), player.play("idle")})
             wait(0.6,() => {action_check = true;})
         }
     });
@@ -183,7 +183,7 @@ scene("main",(level) => {
             action_check = false;
             player.play("dodge_right");
             player.move(2400,0); 
-            wait(0.5,() => {player.move(-2400,0), player.play("idle")})
+            wait(0.5,() => {player.moveTo(center().x, 370), player.play("idle")})
             wait(0.6,() => {action_check = true;})
         }
     });
@@ -194,7 +194,7 @@ scene("main",(level) => {
             player.play("punch");
             player.move(0,-800); 
             wait(0.1,() => {player_attack(player)})
-            wait(0.2,() => {player.play("idle"), player.moveTo(center().x, 420)})
+            wait(0.2,() => {player.play("idle"), player.moveTo(center().x, 370)})
             wait(0.3,() => {action_check = true;})
         }
         }); 
