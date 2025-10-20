@@ -236,12 +236,17 @@ scene("main",(level) => {
 })
 //Scene that plays when you die
 scene("lose", () => {
-    add([ text("Game Over"), pos(center()), anchor("center") ]);
-    wait(2, () => { go("main")});
+    add([ text("Game Over \n Press Z to start again"), pos(center()), anchor("center") ]);
+    onKeyPress("z", () => {
+        go("main")
+        })
 })
 scene("win", () => {
-    add([ text("You Win!!!!!!!!"), pos(center()), anchor("center") ]);
-    wait(5, () => { go("main")});
+    add([ text("You Win!!!!!!!! \n Press Z to start again!"), pos(center()), anchor("center") ]);
+     onKeyPress("z", () => {
+        go("main")
+        })
 })
+
 
 go("main")
